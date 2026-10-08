@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#05070b">
+  <link rel="icon" type="image/png" href="logo-ftc.png">
+  <title>FTC — Full Throttle Championship</title>
+  <style>
+    :root{
+      --bg:#05070b;--panel:#0d1118;--panel2:#121823;--line:#243041;
+      --text:#f4f7fb;--muted:#9ca8b8;--accent:#ff3030;--ok:#35d07f;--danger:#ff4d5e;
+      --shadow:0 16px 40px rgba(0,0,0,.28);--radius:16px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:linear-gradient(180deg,#05070b,#080c12 55%,#05070b);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+    button,input,select{font:inherit}
+    button{cursor:pointer}
+    .top{position:sticky;top:0;z-index:20;background:rgba(5,7,11,.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+    .nav{max-width:1250px;margin:auto;padding:10px 16px;display:flex;align-items:center;gap:14px}
+    .brand{display:flex;align-items:center;gap:10px;min-width:190px}
+    .brand img{width:48px;height:48px;object-fit:contain;border-radius:10px}
+    .brand b{font-size:18px;line-height:1}
+    .brand small{display:block;color:var(--muted);margin-top:4px}
+    .navlinks{display:flex;gap:6px;flex-wrap:wrap}
+    .navlinks button,.adminBtn{border:1px solid transparent;background:transparent;color:#d9e1eb;padding:9px 11px;border-radius:10px}
+    .navlinks button:hover,.navlinks button.active{background:#151c27;border-color:var(--line)}
+    .adminBtn{margin-left:auto;border-color:#5b2227;color:#ff9da4}
+    .wrap{max-width:1250px;margin:auto;padding:24px 16px 70px}
+    .hero{display:grid;grid-template-columns:1.5fr 1fr;gap:18px;margin-bottom:20px}
+    .card{background:linear-gradient(145deg,rgba(18,24,35,.96),rgba(10,14,21,.96));border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}
+    .hero .card:first-child{padding:28px}
+    h1{margin:0 0 8px;font-size:clamp(30px,5vw,56px);letter-spacing:-2px}
+    h2{margin:0 0 14px;font-size:22px}
+    h3{margin:0 0 10px}
+    p{color:var(--muted);line-height:1.55}
+    .heroLogo{width:100%;max-width:190px;display:block;margin:0 auto}
+    .status{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:999px;padding:7px 10px;color:var(--muted);font-size:13px}
+    .dot{width:8px;height:8px;border-radius:50%;background:var(--danger)}
+    .dot.ok{background:var(--ok)}
+    .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+    .stat{padding:16px}.stat strong{display:block;font-size:30px}.stat span{color:var(--muted);font-size:13px}
+    .section{display:none}.section.active{display:block}
+    .sectionHead{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:24px 0 12px}
+    .actions{display:flex;gap:8px;flex-wrap:wrap}
+    .btn{border:1px solid var(--line);background:#151c27;color:#fff;border-radius:10px;padding:9px 13px}
+    .btn:hover{filter:brightness(1.15)}
+    .btn.primary{background:#c91520;border-color:#e32b36}.btn.danger{background:#32131a;border-color:#68212c;color:#ffabb2}
+    .btn.green{background:#103321;border-color:#245d3a;color:#a8efc2}
+    .tableWrap{overflow:auto;border:1px solid var(--line);border-radius:14px}
+    table{width:100%;border-collapse:collapse;min-width:680px}
+    th,td{padding:12px 13px;border-bottom:1px solid var(--line);text-align:left}
+    th{font-size:12px;color:#94a2b4;text-transform:uppercase;letter-spacing:.08em;background:#0b1017;position:sticky;top:0}
+    tr:last-child td{border-bottom:0}
+    .rank{font-weight:800;width:55px}.pts{font-weight:800;font-size:18px}
+    .teamDot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:7px;vertical-align:middle;border:1px solid rgba(255,255,255,.35)}
+    .flag{font-size:22px;margin-right:8px}.muted{color:var(--muted)}
+    .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+    .driverCard{position:relative;overflow:hidden}.driverCard:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--team,#777)}
+    .driverTop{display:flex;justify-content:space-between;gap:10px}.number{font-size:28px;font-weight:900;color:#fff}
+    .tag{display:inline-block;padding:4px 8px;border-radius:999px;background:#1a222e;color:#cdd7e4;font-size:12px}
+    .raceCard{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center}
+    .raceCard + .raceCard{margin-top:10px}
+    .raceInfo{display:flex;align-items:center;gap:10px}
+    .raceRound{width:34px;height:34px;border-radius:10px;background:#1a222e;display:grid;place-items:center;font-weight:800}
+    .podium{font-size:13px;color:var(--muted)}
+    form{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+    label{display:flex;flex-direction:column;gap:6px;color:#aab6c6;font-size:13px}
+    input,select{width:100%;background:#080c12;color:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 11px;outline:none}
+    input:focus,select:focus{border-color:#61728a}
+    .full{grid-column:1/-1}
+    .adminPanel{border-color:#4c2026}
+    .notice{padding:12px;border:1px solid #49321b;background:#21180d;color:#f4d39b;border-radius:12px;margin-bottom:12px}
+    .hidden{display:none!important}
+    .empty{padding:25px;text-align:center;color:var(--muted)}
+    .resultGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+    .resultRow{display:grid;grid-template-columns:42px 1fr 90px;gap:8px;align-items:center}
+    .resultRow span{color:#aab6c6;font-weight:700}
+    .toast{position:fixed;right:16px;bottom:16px;background:#121a25;border:1px solid var(--line);padding:12px 14px;border-radius:12px;box-shadow:var(--shadow);z-index:100;max-width:360px}
+    footer{margin-top:40px;text-align:center;color:#687586;font-size:12px}
+    @media(max-width:900px){.hero{grid-template-columns:1fr}.grid{grid-template-columns:repeat(2,1fr)}.cards{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:650px){
+      .nav{align-items:flex-start;flex-wrap:wrap}.brand{min-width:0}.brand small{display:none}.adminBtn{margin-left:0}
+      .navlinks{order:3;width:100%;overflow:auto;flex-wrap:nowrap}.navlinks button{white-space:nowrap}
+      .wrap{padding:15px 10px 50px}.grid,.cards,form{grid-template-columns:1fr}.resultGrid{grid-template-columns:1fr}
+      .hero .card:first-child{padding:20px}.heroLogo{max-width:130px}h1{font-size:36px}
+      .sectionHead{align-items:flex-start;flex-direction:column}
+    }
+  </style>
+</head>
+<body>
+<header class="top">
+  <div class="nav">
+    <div class="brand">
+      <img src="logo-ftc.png" alt="FTC">
+      <div><b>FTC</b><small>Full Throttle Championship</small></div>
+    </div>
+    <nav class="navlinks">
+      <button data-page="home" class="active">Home</button>
+      <button data-page="calendar">Calendario</button>
+      <button data-page="drivers">Piloti</button>
+      <button data-page="teams">Scuderie</button>
+      <button data-page="standings">Classifiche</button>
+      <button data-page="results">Risultati</button>
+      <button data-page="stats">Statistiche</button>
+    </nav>
+    <button class="adminBtn" id="adminOpen">⚙ Admin</button>
+  </div>
+</header>
+
+<main class="wrap">
+  <section id="home" class="section active">
+    <div class="hero">
+      <div class="card">
+        <div class="status"><i class="dot" id="dbDot"></i><span id="dbStatus">Connessione Firebase...</span></div>
+        <h1>FULL THROTTLE<br>CHAMPIONSHIP</h1>
+        <p>Il campionato FTC in tempo reale. Classifiche, piloti, scuderie, calendario e risultati vengono aggiornati automaticamente.</p>
+        <div class="actions">
+          <button class="btn primary" onclick="showPage('standings')">🏆 Classifiche</button>
+          <button class="btn" onclick="showPage('calendar')">📅 Calendario</button>
+        </div>
+      </div>
+      <div class="card"><img class="heroLogo" src="logo-ftc.png" alt="FTC logo"></div>
+    </div>
+    <div class="grid">
+      <div class="card stat"><span>Piloti</span><strong id="homeDrivers">0</strong></div>
+      <div class="card stat"><span>Scuderie</span><strong id="homeTeams">0</strong></div>
+      <div class="card stat"><span>Gare</span><strong id="homeRaces">0</strong></div>
+      <div class="card stat"><span>Risultati</span><strong id="homeResults">0</strong></div>
+    </div>
+    <div class="sectionHead"><h2>Prossima gara</h2></div>
+    <div id="nextRace"></div>
+  </section>
+
+  <section id="calendar" class="section">
+    <div class="sectionHead"><h2>📅 Calendario</h2></div>
+    <div id="calendarList"></div>
+  </section>
+
+  <section id="drivers" class="section">
+    <div class="sectionHead"><h2>👤 Piloti</h2><div class="actions"><button class="btn primary adminOnly" onclick="showAdminTab('drivers')">+ Gestisci piloti</button></div></div>
+    <div id="driversGrid" class="cards"></div>
+  </section>
+
+  <section id="teams" class="section">
+    <div class="sectionHead"><h2>🏎️ Scuderie</h2><div class="actions"><button class="btn primary adminOnly" onclick="showAdminTab('teams')">+ Gestisci scuderie</button></div></div>
+    <div id="teamsTable"></div>
+  </section>
+
+  <section id="standings" class="section">
+    <div class="sectionHead"><h2>🏆 Classifica Piloti</h2></div>
+    <div id="driverStandings"></div>
+    <div class="sectionHead"><h2>🏆 Classifica Scuderie</h2></div>
+    <div id="teamStandings"></div>
+  </section>
+
+  <section id="results" class="section">
+    <div class="sectionHead"><h2>🏁 Risultati gare</h2></div>
+    <div id="resultsList"></div>
+  </section>
+
+  <section id="stats" class="section">
+    <div class="sectionHead"><h2>📊 Statistiche</h2></div>
+    <div id="statsGrid" class="grid"></div>
+    <div class="sectionHead"><h2>Vittorie e podi</h2></div>
+    <div id="winsTable"></div>
+  </section>
+
+  <section id="admin" class="section">
+    <div class="sectionHead"><h2>⚙ Pannello Admin</h2><div class="actions"><button class="btn" onclick="logoutAdmin()">Esci</button></div></div>
+    <div id="adminLogin" class="card">
+      <h3>Accesso amministratore</h3>
+      <p>Inserisci il PIN amministratore.</p>
+      <form onsubmit="event.preventDefault();loginAdmin()">
+        <label>PIN<input id="adminPin" type="password" autocomplete="current-password" required></label>
+        <div class="full actions"><button class="btn primary">Accedi</button></div>
+      </form>
+      <div class="notice">Nota: questo PIN è una protezione dell'interfaccia. Per la sicurezza definitiva delle scritture Firebase bisogna impostare Firebase Authentication e le regole del database.</div>
+    </div>
+    <div id="adminArea" class="hidden">
+      <div class="actions" style="margin-bottom:14px">
+        <button class="btn" onclick="showAdminTab('overview')">Panoramica</button>
+        <button class="btn" onclick="showAdminTab('drivers')">Piloti</button>
+        <button class="btn" onclick="showAdminTab('teams')">Scuderie</button>
+        <button class="btn" onclick="showAdminTab('races')">Calendario</button>
+        <button class="btn" onclick="showAdminTab('results')">Risultati</button>
+      </div>
+      <div id="adminOverview"></div>
+      <div id="adminDrivers" class="hidden"></div>
+      <div id="adminTeams" class="hidden"></div>
+      <div id="adminRaces" class="hidden"></div>
+      <div id="adminResults" class="hidden"></div>
+    </div>
+  </section>
+
+  <footer>FTC — Full Throttle Championship · Firebase Realtime Database</footer>
+</main>
+
+<div id="toast" class="toast hidden"></div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+  import { getDatabase, ref, onValue, set, update, push, remove, get } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
+  import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+  import { firebaseConfig } from "./firebase-config.js";
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  const auth = getAuth(app);
+
+  const POINTS = [25,19,15,12,10,8,6,4,2,1];
+  const ADMIN_PIN = "FTC2026";
+  const ADMIN_EMAIL = "gabry.ftc.admin@gmail.com";
+
+  const TEAM_COLORS = {
+    "Alpine":"#00A1E8","Aston Martin":"#229971","Audi":"#F50537","Cadillac":"#AAAAAD",
+    "Ferrari":"#E8002D","Haas":"#E6002B","McLaren":"#FF8000","Mercedes":"#27F4D2",
+    "Vcarb":"#6692FF","Red Bull":"#3671C6","Williams":"#1868DB"
+  };
+
+  const DEFAULT_TEAMS = [
+    ["Alpine","#00A1E8"],["Aston Martin","#229971"],["Audi","#F50537"],["Cadillac","#AAAAAD"],
+    ["Ferrari","#E8002D"],["Haas","#E6002B"],["McLaren","#FF8000"],["Mercedes","#27F4D2"],
+    ["Vcarb","#6692FF"],["Red Bull","#3671C6"],["Williams","#1868DB"]
+  ];
+  const DEFAULT_DRIVERS = [
+    ["GolfDavi","93","Alpine"],["BraccioPotente","51","Alpine"],["Luigi","14","Aston Martin"],["RickyJuve","47","Aston Martin"],
+    ["Gabbo","12","Audi"],["DeMalattia","16","Audi"],["Leone","77","Cadillac"],["GyAndre","2","Cadillac"],
+    ["Andrea","49","Ferrari"],["Ricky","41","Ferrari"],["Goofydesert","32","Haas"],["Audio","15","Haas"],
+    ["Gabri","28","McLaren"],["IlBaddi","67","McLaren"],["Red","1","Mercedes"],["Ninja","89","Mercedes"],
+    ["Chompyx","45","Vcarb"],["Gabry","48","Vcarb"],["Casalena","5","Red Bull"],["Nicognana","11","Red Bull"],
+    ["Gose","21","Williams"],["Axer","33","Williams"]
+  ];
+  const DEFAULT_RACES = [
+    ["1","🇧🇭","Bahrain","Bahrain International Circuit","2026-03-08"],
+    ["2","🇸🇦","Arabia Saudita","Jeddah Corniche Circuit","2026-03-15"],
+    ["3","🇦🇺","Australia","Albert Park","2026-03-29"],
+    ["4","🇯🇵","Giappone","Suzuka","2026-04-12"],
+    ["5","🇺🇸","USA","Miami","2026-05-03"],
+    ["6","🇮🇹","Italia","Imola","2026-05-17"]
+  ];
+
+  let state = {drivers:{},teams:{},races:{},results:{}};
+  let adminLogged = false;
+
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+  const uid = () => push(ref(db,"/tmp")).key;
+  const toast = msg => { $("toast").textContent=msg; $("toast").classList.remove("hidden"); clearTimeout(window.__toast); window.__toast=setTimeout(()=>$("toast").classList.add("hidden"),2600); };
+
+  function normalize(){
+    state.drivers ||= {}; state.teams ||= {}; state.races ||= {}; state.results ||= {};
+  }
+
+  async function seedIfEmpty(){
+    const snap = await get(ref(db,"ftc"));
+    if(snap.exists()) return;
+    const drivers={}, teams={}, races={};
+    DEFAULT_TEAMS.forEach(([name,color])=>{teams[name]={name,color}});
+    DEFAULT_DRIVERS.forEach(([name,number,team])=>{drivers[name]={name,number,team}});
+    DEFAULT_RACES.forEach(([round,flag,country,circuit,date])=>{
+      races["r"+round]={round,flag,country,circuit,date};
+    });
+    await set(ref(db,"ftc"),{drivers,teams,races,results:{}});
+  }
+
+  onValue(ref(db,"ftc"), snap => {
+    state = snap.val() || {drivers:{},teams:{},races:{},results:{}};
+    normalize();
+    $("dbDot").classList.add("ok");
+    $("dbStatus").textContent="Firebase sincronizzato in tempo reale";
+    renderAll();
+  }, err => {
+    $("dbStatus").textContent="Errore Firebase: "+err.message;
+    $("dbDot").classList.remove("ok");
+  });
+
+  seedIfEmpty().catch(err=>{ $("dbStatus").textContent="Firebase: "+err.message; });
+
+  window.showPage = page => {
+    document.querySelectorAll(".section").forEach(x=>x.classList.remove("active"));
+    $(page).classList.add("active");
+    document.querySelectorAll(".navlinks button").forEach(x=>x.classList.toggle("active",x.dataset.page===page));
+    window.scrollTo({top:0,behavior:"smooth"});
+    renderAll();
+  };
+  document.querySelectorAll(".navlinks button").forEach(b=>b.onclick=()=>showPage(b.dataset.page));
+
+  function teamColor(team){ return state.teams[team]?.color || TEAM_COLORS[team] || "#777"; }
+  function driversArr(){return Object.values(state.drivers)}
+  function teamsArr(){return Object.values(state.teams)}
+  function racesArr(){return Object.values(state.races).sort((a,b)=>Number(a.round)-Number(b.round))}
+  function resultsArr(){return Object.entries(state.results).map(([id,r])=>({...r,id})).sort((a,b)=>Number(a.round)-Number(b.round))}
+
+  function calc(){
+    const ds={}; driversArr().forEach(d=>ds[d.name]={driver:d,points:0,wins:0,podiums:0,races:0});
+    const ts={}; teamsArr().forEach(t=>ts[t.name]={team:t,points:0,wins:0});
+    resultsArr().forEach(r=>{
+      (r.positions||[]).forEach((name,i)=>{
+        if(!name) return;
+        const pts=POINTS[i]||0;
+        if(ds[name]){ds[name].points+=pts;ds[name].races++;if(i===0)ds[name].wins++;if(i<3)ds[name].podiums++}
+        const d=state.drivers[name]; if(d && ts[d.team]){ts[d.team].points+=pts;if(i===0)ts[d.team].wins++}
+      });
+    });
+    return {drivers:Object.values(ds).sort((a,b)=>b.points-a.points||b.wins-a.wins||a.driver.name.localeCompare(b.driver.name)),teams:Object.values(ts).sort((a,b)=>b.points-a.points||b.wins-a.wins)};
+  }
+
+  function renderAll(){
+    const d=driversArr(),t=teamsArr(),r=racesArr(),res=resultsArr(),c=calc();
+    $("homeDrivers").textContent=d.length;$("homeTeams").textContent=t.length;$("homeRaces").textContent=r.length;$("homeResults").textContent=res.length;
+    renderNextRace(r,res); renderCalendar(r,res); renderDrivers(d,c); renderTeams(t,c); renderStandings(c); renderResults(res); renderStats(c,res); 
+    if(adminLogged) renderAdmin();
+  }
+
+  function renderNextRace(r,res){
+    const done=new Set(res.map(x=>String(x.round)));
+    const next=r.find(x=>!done.has(String(x.round))) || r[0];
+    $("nextRace").innerHTML=next ? `<div class="card raceCard"><div class="raceInfo"><div class="raceRound">${esc(next.round)}</div><div><b>${esc(next.flag||"🏁")} ${esc(next.country)}</b><div class="muted">${esc(next.circuit)} · ${esc(next.date||"Data da definire")}</div></div></div><span class="tag">${done.has(String(next.round))?"Completata":"Prossima"}</span></div>` : `<div class="card empty">Nessuna gara nel calendario.</div>`;
+  }
+
+  function renderCalendar(r,res){
+    const done=new Set(res.map(x=>String(x.round)));
+    $("calendarList").innerHTML=r.length ? r.map(x=>`<div class="card raceCard"><div class="raceInfo"><div class="raceRound">${esc(x.round)}</div><div><b><span class="flag">${esc(x.flag||"🏁")}</span>${esc(x.country)}</b><div class="muted">${esc(x.circuit)} · ${esc(x.date||"Data da definire")}</div></div></div><span class="tag">${done.has(String(x.round))?"✓ Risultato":"In programma"}</span></div>`).join("") : `<div class="card empty">Calendario vuoto.</div>`;
+  }
+
+  function renderDrivers(d,c){
+    $("driversGrid").innerHTML=d.length ? d.map(x=>`<div class="card driverCard" style="--team:${teamColor(x.team)}"><div class="driverTop"><div><h3>${esc(x.name)}</h3><span class="tag"><span class="teamDot" style="background:${teamColor(x.team)}"></span>${esc(x.team)}</span></div><div class="number">#${esc(x.number)}</div></div><p>${c.drivers.find(z=>z.driver.name===x.name)?.points||0} punti · ${c.drivers.find(z=>z.driver.name===x.name)?.wins||0} vittorie · ${c.drivers.find(z=>z.driver.name===x.name)?.podiums||0} podi</p></div>`).join("") : `<div class="card empty">Nessun pilota.</div>`;
+  }
+
+  function renderTeams(t,c){
+    $("teamsTable").innerHTML=`<div class="tableWrap"><table><thead><tr><th>Scuderia</th><th>Piloti</th><th>Punti</th><th>Vittorie</th></tr></thead><tbody>${t.map(x=>{const row=c.teams.find(z=>z.team.name===x.name)||{points:0,wins:0};const n=driByTeam(x.name).length;return `<tr><td><span class="teamDot" style="background:${x.color||teamColor(x.name)}"></span><b>${esc(x.name)}</b></td><td>${n}</td><td class="pts">${row.points}</td><td>${row.wins}</td></tr>`}).join("")}</tbody></table></div>`;
+  }
+  function driByTeam(team){return driversArr().filter(d=>d.team===team)}
+
+  function renderStandings(c){
+    $("driverStandings").innerHTML=`<div class="tableWrap"><table><thead><tr><th>#</th><th>Pilota</th><th>Scuderia</th><th>Gare</th><th>Vittorie</th><th>Podi</th><th>Punti</th></tr></thead><tbody>${c.drivers.map((x,i)=>`<tr><td class="rank">${i+1}</td><td><b>${esc(x.driver.name)}</b> <span class="muted">#${esc(x.driver.number)}</span></td><td><span class="teamDot" style="background:${teamColor(x.driver.team)}"></span>${esc(x.driver.team)}</td><td>${x.races}</td><td>${x.wins}</td><td>${x.podiums}</td><td class="pts">${x.points}</td></tr>`).join("")}</tbody></table></div>`;
+    $("teamStandings").innerHTML=`<div class="tableWrap"><table><thead><tr><th>#</th><th>Scuderia</th><th>Piloti</th><th>Vittorie</th><th>Punti</th></tr></thead><tbody>${c.teams.map((x,i)=>`<tr><td class="rank">${i+1}</td><td><span class="teamDot" style="background:${x.team.color||teamColor(x.team.name)}"></span><b>${esc(x.team.name)}</b></td><td>${driByTeam(x.team.name).map(d=>esc(d.name)).join(", ")||"—"}</td><td>${x.wins}</td><td class="pts">${x.points}</td></tr>`).join("")}</tbody></table></div>`;
+  }
+
+  function renderResults(res){
+    const rMap=Object.fromEntries(racesArr().map(r=>[String(r.round),r]));
+    $("resultsList").innerHTML=res.length ? res.map(r=>`<div class="card" style="margin-bottom:12px"><div class="sectionHead" style="margin:0 0 8px"><div><h3>🏁 Gara ${esc(r.round)} · ${esc(rMap[String(r.round)]?.flag||"🏁")} ${esc(rMap[String(r.round)]?.country||"")}</h3><div class="muted">${esc(rMap[String(r.round)]?.circuit||"")}</div></div><span class="tag">${esc(r.date||rMap[String(r.round)]?.date||"")}</span></div><ol>${(r.positions||[]).filter(Boolean).map((name,i)=>`<li style="padding:4px 0"><b>${esc(name)}</b> <span class="muted">— ${POINTS[i]||0} pt</span></li>`).join("")}</ol></div>`).join("") : `<div class="card empty">Nessun risultato inserito.</div>`;
+  }
+
+  function renderStats(c,res){
+    const totalPoints=c.drivers.reduce((s,x)=>s+x.points,0), winner=c.drivers[0]?.driver.name||"—", wins=c.drivers.reduce((s,x)=>s+x.wins,0), podiums=c.drivers.reduce((s,x)=>s+x.podiums,0);
+    $("statsGrid").innerHTML=`<div class="card stat"><span>Punti assegnati</span><strong>${totalPoints}</strong></div><div class="card stat"><span>Gare disputate</span><strong>${res.length}</strong></div><div class="card stat"><span>Vittorie totali</span><strong>${wins}</strong></div><div class="card stat"><span>Podi totali</span><strong>${podiums}</strong></div>`;
+    $("winsTable").innerHTML=`<div class="tableWrap"><table><thead><tr><th>Pilota</th><th>Scuderia</th><th>Vittorie</th><th>Podi</th><th>Punti</th></tr></thead><tbody>${c.drivers.map(x=>`<tr><td><b>${esc(x.driver.name)}</b></td><td><span class="teamDot" style="background:${teamColor(x.driver.team)}"></span>${esc(x.driver.team)}</td><td>${x.wins}</td><td>${x.podiums}</td><td class="pts">${x.points}</td></tr>`).join("")}</tbody></table></div>`;
+  }
+
+  try {
+    await signInWithEmailAndPassword(auth, ADMIN_EMAIL, password);
+
+    adminLogged = true;
+    $("adminPin").value = "";
+    $("adminLogin").classList.add("hidden");
+    $("adminArea").classList.remove("hidden");
+    showPage("admin");
+    renderAdmin();
+
+    toast("Accesso Admin effettuato");
+  } catch(error) {
+    console.error(error);
+    toast("Password non corretta");
+  }
+}
+   
+   
+  window.loginAdmin=loginAdmin;
+  window.logoutAdmin=()=>{adminLogged=false;$("adminArea").classList.add("hidden");$("adminLogin").classList.remove("hidden");showPage("home")};
+  $("adminOpen").onclick=()=>{showPage("admin");if(adminLogged)renderAdmin()};
+
+  window.showAdminTab=tab=>{
+    if(!adminLogged){showPage("admin");return}
+    ["overview","drivers","teams","races","results"].forEach(x=>$("admin"+x.charAt(0).toUpperCase()+x.slice(1)).classList.toggle("hidden",x!==tab));
+    renderAdmin();
+  };
+
+  function renderAdmin(){
+    $("adminOverview").innerHTML=`<div class="grid"><div class="card stat"><span>Piloti</span><strong>${driversArr().length}</strong></div><div class="card stat"><span>Scuderie</span><strong>${teamsArr().length}</strong></div><div class="card stat"><span>Gare</span><strong>${racesArr().length}</strong></div><div class="card stat"><span>Risultati</span><strong>${resultsArr().length}</strong></div></div><div class="notice" style="margin-top:14px">Le modifiche vengono salvate nel Realtime Database e propagate automaticamente a tutti i dispositivi collegati.</div>`;
+    $("adminDrivers").innerHTML=driverAdminHtml();
+    $("adminTeams").innerHTML=teamAdminHtml();
+    $("adminRaces").innerHTML=raceAdminHtml();
+    $("adminResults").innerHTML=resultAdminHtml();
+  }
+
+  function driverAdminHtml(){
+    return `<div class="card"><h3>Aggiungi pilota</h3><form onsubmit="event.preventDefault();addDriver()"><label>Nome<input id="dName" required></label><label>Numero<input id="dNumber" required></label><label>Scuderia<select id="dTeam">${teamsArr().map(t=>`<option>${esc(t.name)}</option>`).join("")}</select></label><div class="full actions"><button class="btn primary">Aggiungi pilota</button></div></form></div><div class="card" style="margin-top:14px"><h3>Piloti esistenti</h3><div class="tableWrap"><table><thead><tr><th>Pilota</th><th>#</th><th>Scuderia</th><th></th></tr></thead><tbody>${driversArr().map(d=>`<tr><td>${esc(d.name)}</td><td>${esc(d.number)}</td><td>${esc(d.team)}</td><td><button class="btn danger" onclick="deleteDriver('${encodeURIComponent(d.name)}')">Elimina</button></td></tr>`).join("")}</tbody></table></div></div>`;
+  }
+  function teamAdminHtml(){
+    return `<div class="card"><h3>Aggiungi scuderia</h3><form onsubmit="event.preventDefault();addTeam()"><label>Nome<input id="tName" required></label><label>Colore<input id="tColor" type="color" value="#888888"></label><div class="full actions"><button class="btn primary">Aggiungi scuderia</button></div></form></div><div class="card" style="margin-top:14px"><h3>Scuderie esistenti</h3><div class="tableWrap"><table><thead><tr><th>Scuderia</th><th>Colore</th><th>Piloti</th><th></th></tr></thead><tbody>${teamsArr().map(t=>`<tr><td><span class="teamDot" style="background:${t.color||teamColor(t.name)}"></span>${esc(t.name)}</td><td><input type="color" value="${esc(t.color||"#888888")}" onchange="changeTeamColor('${encodeURIComponent(t.name)}',this.value)"></td><td>${driByTeam(t.name).length}</td><td><button class="btn danger" onclick="deleteTeam('${encodeURIComponent(t.name)}')">Elimina</button></td></tr>`).join("")}</tbody></table></div></div>`;
+  }
+  function raceAdminHtml(){
+    return `<div class="card"><h3></h3><form onsubmit="event.preventDefault();addRace()"><label>Round<input id="rRound" type="number" min="1" required></label><label>Bandiera emoji<input id="rFlag" placeholder="🇮🇹" required></label><label>Nazione<input id="rCountry" required></label><label>Circuito<input id="rCircuit" required></label><label>Data<input id="rDate" type="date"></label><div class="full actions"><button class="btn primary">Aggiungi gara</button></div></form></div><div class="card" style="margin-top:14px"><h3>Calendario esistente</h3>${racesArr().map(r=>`<div class="raceCard card" style="padding:12px;margin-top:8px"><div><b>${esc(r.flag)} ${esc(r.country)}</b><div class="muted">Round ${esc(r.round)} · ${esc(r.circuit)} · ${esc(r.date||"")}</div></div><button class="btn danger" onclick="deleteRace('${encodeURIComponent(r.round)}')">Elimina</button></div>`).join("")}</div>`;
+  }
+  function resultAdminHtml(){
+    const races=racesArr(), ds=driversArr();
+    return `<div class="card"><h3>Inserisci / sostituisci risultato gara</h3><form onsubmit="event.preventDefault();saveResult()"><label>Gara<select id="resRace">${races.map(r=>`<option value="${esc(r.round)}">Round ${esc(r.round)} — ${esc(r.flag)} ${esc(r.country)}</option>`).join("")}</select></label><label>Data risultato<input id="resDate" type="date"></label><div class="full"><div class="resultGrid">${Array.from({length:10},(_,i)=>`<label>Posizione ${i+1} — ${POINTS[i]} pt<select id="pos${i}"><option value="">— nessuno —</option>${ds.map(d=>`<option value="${esc(d.name)}">${esc(d.name)} #${esc(d.number)}</option>`).join("")}</select></label>`).join("")}</div></div><div class="full actions"><button class="btn primary">Salva risultato</button></div></form></div><div class="card" style="margin-top:14px"><h3>Risultati presenti</h3>${resultsArr().map(r=>`<div class="raceCard card" style="padding:12px;margin-top:8px"><div><b>Round ${esc(r.round)}</b><div class="muted">${(r.positions||[]).filter(Boolean).slice(0,3).map(esc).join(" · ")}</div></div><button class="btn danger" onclick="deleteResult('${encodeURIComponent(r.id)}')">Elimina</button></div>`).join("")}</div>`;
+  }
+
+  window.addDriver=async()=>{
+    const name=$("dName").value.trim(), number=$("dNumber").value.trim(), team=$("dTeam").value;
+    if(!name||state.drivers[name]) return toast("Nome pilota già presente o non valido");
+    await set(ref(db,"ftc/drivers/"+name),{name,number,team});toast("Pilota aggiunto");
+  };
+  window.deleteDriver=async key=>{const name=decodeURIComponent(key);if(!confirm("Eliminare "+name+"?"))return;await remove(ref(db,"ftc/drivers/"+name));toast("Pilota eliminato");};
+  window.addTeam=async()=>{const name=$("tName").value.trim(),color=$("tColor").value;if(!name||state.teams[name])return toast("Scuderia già presente");await set(ref(db,"ftc/teams/"+name),{name,color});toast("Scuderia aggiunta");};
+  window.changeTeamColor=async(key,color)=>{const name=decodeURIComponent(key);await update(ref(db,"ftc/teams/"+name),{color});};
+  window.deleteTeam=async key=>{const name=decodeURIComponent(key);if(driByTeam(name).length)return toast("Prima sposta o elimina i piloti di questa scuderia");if(!confirm("Eliminare "+name+"?"))return;await remove(ref(db,"ftc/teams/"+name));toast("Scuderia eliminata");};
+window.addRace=async()=>{
+  try {
+    const round = $("rRound").value.trim();
+    const id = "r" + round;
+
+    if(!round){
+      return toast("Inserisci il numero del round");
+    }
+
+    if(state.races[id]){
+      return toast("Round già presente");
+    }
+
+    await set(ref(db,"ftc/races/"+id),{
+      round,
+      flag: $("rFlag").value.trim(),
+      country: $("rCountry").value.trim(),
+      circuit: $("rCircuit").value.trim(),
+      date: $("rDate").value
+    });
+
+    toast("Gara aggiunta correttamente");
+
+  } catch(error) {
+    console.error("ERRORE AGGIUNTA GARA:", error);
+
+    alert(
+      "ERRORE FIREBASE\n\n" +
+      "Codice: " + error.code + "\n" +
+      "Messaggio: " + error.message
+    );
+  }
+};
+  window.deleteResult=async id=>{if(!confirm("Eliminare questo risultato?"))return;await remove(ref(db,"ftc/results/"+decodeURIComponent(id)));toast("Risultato eliminato");};
+
+  window.showAdminTab("overview");
+</script>
+</body>
+</html>
