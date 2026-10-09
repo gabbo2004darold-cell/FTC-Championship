@@ -87,6 +87,48 @@
       .hero .card:first-child{padding:20px}.heroLogo{max-width:130px}h1{font-size:36px}
       .sectionHead{align-items:flex-start;flex-direction:column}
     }
+/* FIX APP ANDROID - TEMA SCURO */
+
+html,
+body {
+  background: #0b0f14 !important;
+  color: #e7edf5 !important;
+}
+
+main,
+section,
+.wrap,
+.hero,
+.card,
+.grid {
+  background: transparent !important;
+  color: #e7edf5 !important;
+}
+
+h1,
+h2,
+h3,
+h4,
+p,
+span,
+label,
+strong {
+  color: #e7edf5;
+}
+
+.sectionHead h2 {
+  color: #e7edf5 !important;
+}
+
+.nav,
+header {
+  background: #17191f !important;
+}
+
+footer {
+  background: transparent !important;
+  color: #687586 !important;
+}
   </style>
 </head>
 <body>
@@ -118,8 +160,8 @@
         <p>Il campionato FTC in tempo reale. Classifiche, piloti, scuderie, calendario e risultati vengono aggiornati automaticamente.</p>
         <div class="actions">
   <button class="btn primary" onclick="showPage('standings')">🏆 Classifiche</button>
-  <button class="btn" onclick="showPage('calendar')">📅 Calendario</button>
-  <a class="btn green" href="FTC-Championship.apk" download>📱 Scarica App</a>
+  <button class="btn" onclick="showPage('calendar')">📅 Calendario</button><a class="btn green" href="https://github.com/gabbo2004darold-cell/FTC-Championship/releases/tag/v1.0.0" target="_blank">📱 Scarica App</a>
+Scarica App</a>
 </div>     
  </div>
       <div class="card"><img class="heroLogo" src="logo-ftc.png" alt="FTC logo"></div>
@@ -348,8 +390,9 @@
     renderSeasonSelector();
   });
 
-  onValue(ref(db,"ftc/seasons/"+currentSeasonId), snap => {
-    const data = snap.val() || {};
+  onValue(ref(db,"ftc/seasons"), snap => {
+    const allSeasons = snap.val() || {};
+    const data = allSeasons[currentSeasonId] || {};
     state = {
       drivers:data.drivers || {}, teams:data.teams || {},
       races:data.races || {}, results:data.results || {}
@@ -528,7 +571,69 @@ async function loginAdmin(){
       toast("Errore Firebase: "+error.message);
     }
   };
+window.saveResult = async function saveResult() {
+  if(!adminLogged) return toast("Accesso Admin richiesto");
 
+  const round = $("resRace").value;
+  const date = $("resDate").value;
+
+  if(!round) return toast("Seleziona una gara");
+
+  const positions = [];
+
+  for(let i = 0; i < 10; i++){
+    positions.push($("pos"+i).value || "");
+  }
+
+  const validPositions = positions.filter(Boolean);
+
+  if(validPositions.length === 0){
+    return toast("Inserisci almeno un pilota");
+  }
+
+  const unique = new Set(validPositions);
+
+  if(unique.size !== validPositions.length){
+    return toast("Non puoi inserire lo stesso pilota più volte");
+  }
+
+  const resultId = "r" + round;
+
+  try {
+    await set(
+      ref(db, "ftc/seasons/" + currentSeasonId + "/results/" + resultId),
+      {
+        round: round,
+        date: date,
+        positions: positions
+      }
+    );
+
+    toast("Risultato gara salvato correttamente");
+
+  } catch(error) {
+    console.error("ERRORE SALVATAGGIO RISULTATO:", error);
+    toast("Errore Firebase: " + error.message);
+  }
+};
+window.deleteRace = async id => {
+  if(!adminLogged) return toast("Accesso Admin richiesto");
+
+  if(!confirm("Eliminare questa gara?")) return;
+
+  try {
+    const round = decodeURIComponent(id);
+
+    await remove(
+      ref(db, "ftc/seasons/" + currentSeasonId + "/races/r" + round)
+    );
+
+    toast("Gara eliminata correttamente");
+  } catch(error) {
+    console.error("ERRORE ELIMINAZIONE GARA:", error);
+    toast("Errore Firebase: " + error.message);
+  }
+};
   window.deleteResult=async id=>{if(!confirm("Eliminare questo risultato?"))return;await remove(ref(db,"ftc/seasons/"+currentSeasonId+"/results/"+decodeURIComponent(id)));toast("Risultato eliminato");};
 
   window.showAdminTab("overview");
